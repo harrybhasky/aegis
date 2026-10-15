@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/harib/code/Projects/AI_RTL_Ver/aegis_agents/bench/report.py", line 128, in <module>
+    main()
+    ~~~~^^
+  File "/Users/harib/code/Projects/AI_RTL_Ver/aegis_agents/bench/report.py", line 84, in main
+    md = ["# AEGIS benchmark report", "", "Generated from %d run summaries. Changes are relative to the synthesis-only "
+                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          "baseline (Yosys + delay-driven ABC, Nangate45, OpenSTA); negative WNS/TNS % = less negative slack." % len(rows), "",
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+TypeError: not enough arguments for format string

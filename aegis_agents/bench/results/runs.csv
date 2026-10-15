@@ -1,0 +1,9 @@
+design,config,model,run_id,iterations,wns_base,wns_final,dwns_pct,tns_base,tns_final,dtns_pct,area_base,area_final,darea_pct,candidates,sec_pass_rate,lock_violations,cdc_violations,tokens,cost_usd,wall_s
+afifo,vanilla,claude-sonnet-5-5,vanilla.sonnet-5-5.r1,5,-0.15,-0.15,0.0,-11.21,-11.21,0.0,1341.172,1341.172,0.0,25,0.0,0,0,0,0,204.1
+async_fifo,vanilla,claude-sonnet-5-5,vanilla.sonnet-5-5.r1,5,-0.16,-0.03,81.25,-2.87,-1.92,33.10104529616725,1387.456,1506.624,8.588957055214733,25,0.0,0,15,174105,0.9576,262.1
+axil_cdc,vanilla,claude-sonnet-5-5,vanilla.sonnet-5-5.r1,5,-0.09,-0.09,0.0,-18.73,-18.73,0.0,2040.752,2040.752,0.0,25,0.0,0,0,0,0,204.1
+axis_async_fifo,vanilla,claude-sonnet-5-5,vanilla.sonnet-5-5.r1,5,-0.24,-0.24,0.0,-25.86,-25.86,0.0,3785.978,3785.978,0.0,25,0.0,0,0,0,0,200.1
+drrtl_fifo_2clk,vanilla,claude-sonnet-5-5,vanilla.sonnet-5-5.r1,5,-0.2,-0.2,0.0,-6.86,-6.86,0.0,35928.088,35928.088,0.0,25,0.0,0,0,0,0,210.1
+eth_mac_1g_fifo,vanilla,claude-sonnet-5-5,vanilla.sonnet-5-5.r1,5,-0.33,-0.33,0.0,-48.29,-48.29,0.0,15108.268,15108.268,0.0,25,0.0,0,0,0,0,882.8
+soc,aegis,claude-sonnet-5-5,aegis.sonnet-5-5.r1,3,-0.38,-0.38,0.0,-3.34,-2.38,28.742514970059883,1146.992,1107.624,-3.43228200371057,15,53.333333333333336,0,0,132392,0.6317,243.6
+soc,vanilla,claude-sonnet-5-5,vanilla.sonnet-5-5.r1,5,-0.38,-0.38,0.0,-3.34,-2.37,29.041916167664663,1146.992,1107.624,-3.43228200371057,25,4.0,0,24,228346,0.7891,332.8

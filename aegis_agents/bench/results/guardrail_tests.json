@@ -1,0 +1,116 @@
+[
+ {
+  "design": "soc",
+  "class": "equivalent",
+  "mutation": "wfull compare as XOR-reduce",
+  "lock": true,
+  "lint": true,
+  "sim": true,
+  "sim_mismatches": 0,
+  "eqy": "PASS",
+  "cdc": true,
+  "cdc_violations": []
+ },
+ {
+  "design": "soc",
+  "class": "functional_bug",
+  "mutation": "full flag compares against un-inverted MSBs",
+  "lock": true,
+  "lint": true,
+  "sim": false,
+  "sim_mismatches": 8157,
+  "eqy": "FAIL",
+  "cdc": null,
+  "cdc_violations": []
+ },
+ {
+  "design": "soc",
+  "class": "sync_edit",
+  "mutation": "second synchronizer stage samples d directly",
+  "lock": false,
+  "lint": true,
+  "sim": false,
+  "sim_mismatches": 8146,
+  "eqy": "FAIL",
+  "cdc": null,
+  "cdc_violations": []
+ },
+ {
+  "design": "soc",
+  "class": "gray_binary",
+  "mutation": "write pointer launched in binary",
+  "lock": true,
+  "lint": true,
+  "sim": false,
+  "sim_mismatches": 2541,
+  "eqy": "FAIL",
+  "cdc": null,
+  "cdc_violations": []
+ },
+ {
+  "design": "soc",
+  "class": "comb_launch",
+  "mutation": "Gray pointer driven combinationally from the binary register",
+  "lock": true,
+  "lint": true,
+  "sim": true,
+  "sim_mismatches": 0,
+  "eqy": "FAIL",
+  "cdc": false,
+  "cdc_violations": [
+   "new unsynchronized crossing u_wptr.waddr -> u_s_w2r.s1",
+   "crossing u_wptr.wptr -> u_s_w2r.s1 (gray_candidate) disappeared",
+   "contract x_41e513aa no longer proven"
+  ]
+ },
+ {
+  "design": "async_fifo",
+  "class": "equivalent",
+  "mutation": "full compare as XOR-reduce",
+  "lock": true,
+  "lint": true,
+  "sim": true,
+  "sim_mismatches": 0,
+  "eqy": "PASS",
+  "cdc": true,
+  "cdc_violations": []
+ },
+ {
+  "design": "async_fifo",
+  "class": "functional_bug",
+  "mutation": "binary increment ignores full",
+  "lock": true,
+  "lint": true,
+  "sim": true,
+  "sim_mismatches": 0,
+  "eqy": "FAIL",
+  "cdc": true,
+  "cdc_violations": []
+ },
+ {
+  "design": "async_fifo",
+  "class": "sync_edit",
+  "mutation": "read-pointer synchronizer reduced to one stage",
+  "lock": false,
+  "lint": true,
+  "sim": false,
+  "sim_mismatches": 4,
+  "eqy": "FAIL",
+  "cdc": null,
+  "cdc_violations": []
+ },
+ {
+  "design": "async_fifo",
+  "class": "gray_binary",
+  "mutation": "write pointer launched in binary",
+  "lock": true,
+  "lint": true,
+  "sim": true,
+  "sim_mismatches": 0,
+  "eqy": "FAIL",
+  "cdc": false,
+  "cdc_violations": [
+   "contract x_cf11da04 no longer proven"
+  ]
+ }
+]

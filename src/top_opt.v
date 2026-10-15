@@ -1,0 +1,7 @@
+// placeholder top module with one pipeline stage
+module top(input clk, input rst, input [31:0] in, output reg [31:0] out);
+  reg [31:0] s1;
+  always @(posedge clk) begin
+    if (rst) begin s1 <= 0; out <= 0; end else begin s1 <= in; out <= s1; end
+  end
+endmodule

@@ -1,0 +1,17 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+*.log
+flow/work/
+flow/runs/
+flow/log/
+flow/rtl/*/v[1-9]*/
+bench/cdc_mutants/out/
+*.vcd
+*.fst
+*.il
+*.jsonl
