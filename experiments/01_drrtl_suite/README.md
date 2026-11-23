@@ -2,7 +2,7 @@
 
 Dr. RTL's 20 released designs (`benchmarks/Dr_RTL/rtl_dataset`, v0, unchanged), already set up as
 `aegis_agents/flow/designs/drrtl_*` with Dr. RTL's 0.1 ns clock. Phase 1 and the synthesis-only baselines
-are in `aegis_agents/bench/results/baseline.md`; all 20 designs violate timing.
+are produced by `aegis_agents/bench/run_baseline.py`; all 20 designs violate timing.
 
 ## Configurations
 

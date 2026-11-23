@@ -34,27 +34,7 @@ LLM-based RTL optimization is attractive because timing closure is iterative, ex
 - **Domain-aware scoring:** WNS/TNS are evaluated per clock domain so a gain in one domain cannot hide a regression in another.
 - **Formal hard gates:** EQY failures reject candidates instead of becoming a soft penalty.
 - **Self-improving skills:** the Librarian tracks pattern-level outcomes, confidence, anti-patterns, and reuse across designs.
-- **Reproducible artifacts:** benchmark inputs, baseline tables, guardrail mutation results, experiment reports, and paper drafts are included.
-
-## Evidence in this release
-
-The included reports are intentionally transparent about both successes and limitations:
-
-| Artifact | What it demonstrates |
-|---|---|
-| [`aegis_agents/bench/results/baseline.md`](aegis_agents/bench/results/baseline.md) | Baseline synthesis, clock, CDC, lock, timing, and area characterization |
-| [`aegis_agents/bench/results/guardrail_tests.md`](aegis_agents/bench/results/guardrail_tests.md) | Equivalent rewrites pass; unsafe mutation classes are rejected |
-| [`experiments/01_drrtl_suite/results/report.md`](experiments/01_drrtl_suite/results/report.md) | AEGIS vs. vanilla/Dr. RTL-style runs and candidate rejection reasons |
-| [`REPORT.md`](REPORT.md) | Technical report with methodology, headline results, limitations, and venue positioning |
-| [`paper/main.md`](paper/main.md) | Full research manuscript draft |
-
-### Headline measured results
-
-- **40+ baseline designs** are characterized across single-clock and CDC suites, including multi-clock FIFOs, handshakes, reset controllers, AXI/Wishbone bridges, Ethernet, and SoC-scale examples.
-- The guardrail mutation suite includes **equivalent, functional-bug, synchronizer, Gray-binary, and combinational-launch** classes.
-- In the reported comparison, AEGIS achieved **53.33% SEC candidate pass rate on `soc` versus 4.00% for vanilla**, with **zero measured lock violations** in the AEGIS run.
-- The AEGIS `soc` run preserved top-level equivalence and showed a **3.43% area reduction** versus its synthesis-only baseline while removing the `clk_w` deficit; the remaining `clk_x` deficit is reported rather than hidden.
-- The release includes negative results: some runs regress timing or fail EQY. Those outcomes remain in the reports because reliability and failure diagnosis are part of the research claim.
+- **Reproducible artifacts:** benchmark inputs, design constraints, the CDC mutation generator and labeler, and the experiment harness are included.
 
 ## Repository map
 
@@ -65,13 +45,11 @@ The included reports are intentionally transparent about both successes and limi
 │   ├── bench/                 Baselines, CDC mutation tests, suites, and report generation
 │   └── .claude/               Agent and RTL optimization skill definitions
 ├── benchmarks/                Benchmark provenance and redistribution notes
-├── experiments/               Reproducible experiment manifests and reports
-├── paper/                     Manuscript, outline, related work, and bibliography
+├── experiments/               Reproducible experiment manifests
 ├── scripts/                   Yosys, OpenSTA, Verilator, and EQY wrappers
 ├── src/                       Minimal example RTL
 ├── tests/                     Unit tests for parser and scoring helpers
 ├── orchestrator_langgraph.py  Standalone LangGraph/Gemini prototype
-├── REPORT.md                  Technical project report
 └── rtl-timing-analyzer.md     Project-facing timing analysis notes
 ```
 
@@ -104,38 +82,10 @@ python3 aegis_agents/bench/report.py --out aegis_agents/bench/results
 
 Full EDA runs require the tools, liberty files, and benchmark sources described in the benchmark documentation. Generated netlists, solver workspaces, downloaded third-party repositories, and local credentials are intentionally not part of this public release.
 
-## Research positioning and target conferences
-
-The project was developed with the following publication targets in mind:
-
-1. **IEEE/ACM International Conference on Computer-Aided Design (ICCAD)** — primary target for the EDA automation, RTL optimization, and formal guardrail contribution.
-2. **ACM/IEEE Design Automation Conference (DAC)** — fit for the end-to-end design automation and practical timing-closure story.
-3. **ACM/IEEE International Symposium on Machine Learning for CAD (MLCAD)** — fit for LLM orchestration, learned skill library, and ablation methodology.
-4. **Asia and South Pacific Design Automation Conference (ASP-DAC)** and **Design, Automation and Test in Europe (DATE)** — secondary targets for the cross-domain verification and reproducible benchmark angle.
-
-These are **target venues, not claims of acceptance or publication**. The manuscript keeps verification notes for related-work venue attribution in [`paper/related_work_notes.md`](paper/related_work_notes.md).
-
 ## Scope and limitations
 
-AEGIS is a research prototype, not a signoff replacement. Its structural checks are conservative and can produce false positives or miss RTL idioms they do not recognize. The included reports document known limitations in vector synchronizer recognition, Gray-bus inference, reset-domain crossings, port-sourced data crossings, and calibration of some contract-bound logic. Physical placement/routing effects are not modeled by the synthesis-only timing flow.
+AEGIS is a research prototype, not a signoff replacement. Its structural checks are conservative and can produce false positives or miss RTL idioms they do not recognize. Known limitations include in vector synchronizer recognition, Gray-bus inference, reset-domain crossings, port-sourced data crossings, and calibration of some contract-bound logic. Physical placement/routing effects are not modeled by the synthesis-only timing flow.
 
 ## Responsible release notes
 
-This repository contains original AEGIS code, documentation, reports, and research drafts. Third-party benchmark provenance and license notes are preserved in [`benchmarks/README.md`](benchmarks/README.md); full upstream benchmark copies and unrelated local media are not redistributed here. Before using an upstream design in a public experiment, follow its license and request permission where the provenance notes require it.
-
-## Citation
-
-The manuscript draft is in [`paper/main.md`](paper/main.md). Until a citable version is published, please cite the repository directly:
-
-```bibtex
-@software{aegis_rtl_optimization,
-  title  = {AEGIS: Guardrailed LLM Optimization of Multi-Clock RTL for Timing Closure},
-  author = {Bhasky, Harry},
-  year   = {2026},
-  url    = {https://github.com/harrybhasky/aegis}
-}
-```
-
-## Maintainer
-
-**Harry Bhasky** — RTL design, EDA automation, formal verification, CDC methodology, and LLM systems for hardware engineering.
+This repository contains original AEGIS code and documentation. Third-party benchmark provenance and license notes are preserved in [`benchmarks/README.md`](benchmarks/README.md); full upstream benchmark copies and unrelated local media are not redistributed here. Before using an upstream design in a public experiment, follow its license and request permission where the provenance notes require it.

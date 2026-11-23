@@ -43,8 +43,7 @@ Suggested tiers: (1) small CDC primitives, for lock-precision/recall tests;
 
 Added to broaden the CDC suite beyond Gray FIFOs, with handshake, pulse, req/ack and reset/clear-sequencing protocols.
 They are set up with `python3 bench/setup_designs.py --suite cdc --calibrate --only <name...>`; `--only` leaves every
-other design untouched. Phase 1 and the baselines come from `bench/run_baseline.py --designs <name...>`, and the rows are
-in `aegis_agents/bench/results/baseline.{json,md}`.
+other design untouched. Phase 1 and the baselines come from `bench/run_baseline.py --designs <name...>`.
 
 **Conversion.** The SystemVerilog sources (PULP, OpenTitan) are converted once to plain Verilog-2005 with
 sv2v 0.0.13 (Homebrew arm64 bottle) by `multiclock/converted/convert.sh`. The output goes to `converted/<design>/<design>.v`,
@@ -61,7 +60,7 @@ rendering `'0` as `1'sh0`, and UNUSED. apbxclk and wbxclk need `-g2012`, as the 
 uses a localparam in the parameter port list and an output port driven onto a reg.
 
 Crossings are listed as sync / gray / qualified / R2 (1-flop) / R1 (unsynchronized). Every design has two asynchronous
-clocks, and every Phase 1 ingest took 0.3 to 0.5 s. Contracts: **0 proven on every design**; see the issues below.
+clocks, and every Phase 1 ingest took 0.3 to 0.5 s.
 WNS is the timing-driven synthesis baseline at the calibrated periods (ratio 0.75).
 
 | Design | Upstream module(s) | Protocol | Clocks (calibrated ns) | Flops | Crossings s/g/q/R2/R1 | Locked lines | WNS synth (ns) | License |
@@ -88,45 +87,3 @@ Not added:
   The cause is the function-based CRC mask in `verilog-ethernet/rtl/lfsr.v:220-257`, used by `axis_xgmii_tx_*`.
 - `eth_mac_1g_rgmii_fifo`: needs DDR I/O primitives and a 90-degree clock, and adds no protocol type beyond `eth_mac_1g_fifo`.
 
-### Phase 1 issues on these designs (tool findings; `tools/` not modified)
-
-**No pre-existing CDC bug was found in any of these designs.** Every R1/R2 that Phase 1 reports is a tool false positive:
-
-1. **Vector shift-register synchronizers are not recognized.** This produces **21 false R1/R2s across all six PULP designs.**
-   `tc_sync` keeps its stages in one vector: `reg_q <= {reg_q[Stages-2:0], serial_i}` (`tech_cells_generic/src/rtl/tc_sync.sv:30-34`).
-   Yosys builds a single 2-bit `$adff` with `D = {reg_q[0], <async input>}`. `aegis_ingest.py:370/375` marks the edge
-   non-direct because the D pin has two driving cells, and `next_stage()` (`:379-388`) looks for a separate cell.
-   So `async_req`/`async_ack` into `i_sync.reg_q` is reported as R1. The data captures they qualify are reported as R2,
-   or as R1 for the spill-register captures. Example: `data_dst_q`, loaded only when `req_synced != req_synced_q1`
-   (`common_cells/src/cc_cdc_2phase.sv:175,196`), is reported as `R2: u.i_cdc.async_data -> dst_data_o`.
-   Check: replacing `tc_sync` with two discrete flops, in a scratch copy only, turns all 21 into 2 to 8 synchronizers
-   plus 1 to 3 qualified captures per design, with zero issues left.
-2. **A Gray bus synchronized bit by bit is not seen as a Gray bus.** This is a false negative for Gray contracts.
-   `cc_cdc_fifo_gray` syncs each pointer bit through its own `tc_sync` (`cc_cdc_fifo_gray.sv:329-330, 392-393`).
-   Even with the fix from item 1, the tool sees 8 one-bit synchronizers and no `gray_candidate`, because
-   `aegis_ingest.py:431` needs `bits > 1` per (src, dst) register pair. No Gray contract or Gray audit is produced.
-3. **A qualifier folded into a sync-reset pin is ignored.** This is the false R2 on apbxclk.
-   `if (s_request && s_ack) s_prdata <= m_prdata; else s_prdata <= 0;` (`wb2axip/rtl/apbxclk.v:251-255`) becomes a
-   `$sdff` with `D = m_prdata` and `SRST = s_request && s_ack`. `ff_data_bits` skips SRST (`aegis_ingest.py:42, 276`),
-   so the synchronized `s_ack` qualifier is invisible and the crossing is reported as a 1-flop synchronizer.
-4. **Gray contracts are never calibrated** on prim_fifo_async, wbxclk or axixclk. The warning is "launch register is
-   not a port of a module with a reset; left immutable" (`aegis_ingest.py:521, 542`). This is the same limitation that
-   gives 0 contracts on the existing afifo, axis_async_fifo and eth_mac_1g_fifo; only async_fifo and soc prove Gray
-   contracts. The affected Gray logic stays immutable, so this is conservative.
-5. **A register named after a net alias gets a vacuous lock** (hash of the empty string, no lines locked):
-   - prim_fifo_async launch registers `fifo_{w,r}ptr_gray_q` (`prim_fifo_async.sv:67-72, 100-105`) are named `u.u_fifo.sync_{w,r}ptr.d_i`.
-   - In prim_reg_cdc, `src_q` is named `dst_wd_o`, `src_busy_q` is named `src_busy_o`, and the launch register `u.u_reg.dst_qs` gets the same empty lock.
-   - In apbxclk, `s_pslverr` is named `u.S_APB_PSLVERR`.
-
-   The assignment regex in `lock_ff_block` searches for `<alias> <=` and never matches. This also affects existing designs:
-   axil_cdc (9 entries) and soc (`hs_data`, `hs_out`).
-6. **Crossings Phase 1 cannot see:**
-   - **Port-sourced data crossings.** Examples: apbxclk `m_paddr <= S_APB_PADDR` (`apbxclk.v:226-228`), the data outputs
-     of `prim_sync_reqack_data`, and `prim_reg_cdc` `dst_wd_o`. Ports have no clock domain in the SDC.
-   - **Reset-domain crossings.** ARST pins are skipped. Examples: apbxclk `full_reset` is reset by M-domain `M_PRESETn`
-     (`apbxclk.v:94-98`), and wbxclk `xck_reset` is set by wb-domain `bus_abort` (`wbxclk.v:181-186`).
-   - **Port-fed reset synchronizers** are not locked. Examples: axixclk `mreset` (`axixclk.v:155-161`) and apbxclk
-     `M_PRESETn` (`apbxclk.v:89-93`). axixclk's `(* ASYNC_REG *)` sits on the `initial` statement rather than the reg, so
-     the attribute lock misses it too. OpenSTA does check these resets (recovery/removal, path group `asynchronous`).
-   - **R1/R2 crossings get no launch/capture lock**, despite the module docstring (`aegis_ingest.py:609-638` covers only
-     sync, gray and qualified crossings). On the PULP designs the `dont_touch` attributes still lock most of these flops.
